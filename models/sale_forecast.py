@@ -1,19 +1,10 @@
-# -*- encoding: utf-8 -*-
-##############################################################################
-#
-#    Bista Solutions Pvt. Ltd
-#    Copyright (C) 2012 (http://www.bistasolutions.com)
-#
-##############################################################################
 
-from openerp import models, fields, api, _
-from datetime import datetime, date
-from openerp.exceptions import Warning, UserError
-from openerp.tools.translate import _
+from odoo import models, fields, api
+from odoo.exceptions import Warning, UserError
+from odoo.tools.translate import _
 from datetime import datetime
-import time
 from dateutil.relativedelta import relativedelta
-from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 
 
 class sale_forecast(models.Model):
@@ -118,8 +109,6 @@ class sale_forecast(models.Model):
 
     @api.model
     def create(self, vals):
-        print vals
-
         if 'period_count' in  vals:
             if vals['period_count'] < 0:
                 raise Warning(_('Number of Periods should not be less than zero'))
