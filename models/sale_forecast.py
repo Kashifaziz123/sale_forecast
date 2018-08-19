@@ -118,16 +118,18 @@ class sale_forecast(models.Model):
 
     @api.model
     def create(self, vals):
-        if vals.has_key('period_count'):
+        print vals
+
+        if 'period_count' in  vals:
             if vals['period_count'] < 0:
                 raise Warning(_('Number of Periods should not be less than zero'))
         return super(sale_forecast, self).create(vals)
 
     @api.multi
     def write(self, vals):
-        if vals.has_key('forecast_filter_id'):
+        if 'forecast_filter_id' in vals:
             vals['forecast_filter_id'] = False
-        if vals.has_key('period_count'):
+        if 'period_count' in vals:
             if vals['period_count'] <= 0:
                 raise Warning(_('Number of Periods should be grater than zero'))
         return super(sale_forecast, self).write(vals)
