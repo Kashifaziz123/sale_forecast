@@ -344,7 +344,7 @@ class sale_forecast(models.Model):
 
     @api.multi
     def perform_action(self):
-	location_id = False
+        location_id = False
         if self.create_action:
             if self.state != 'confirm':
                 raise Warning(_('Forecast State should be Confirmed'))
