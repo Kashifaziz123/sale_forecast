@@ -1,4 +1,3 @@
-
 from odoo import models, fields, api
 from odoo.exceptions import Warning, UserError
 from odoo.tools.translate import _
@@ -30,6 +29,7 @@ class sale_forecast(models.Model):
     sales_person_id = fields.Many2one('res.users', string='Salesperson')
     past_forecast_records = fields.Boolean(string='Show Past Forecast Records')
     past_sales_records = fields.Boolean(string='Show Past Sales Records')
+    periods_ids = fields.One2many('sale.forecast.periods', 'period_id')
 
     # sales_team_id = fields.Many2one('crm.team', string='Sales Team')
 
@@ -51,7 +51,7 @@ class sale_forecast(models.Model):
             return {}
         if forecast_filter_id:
             s_rec = f_product_obj.search(cr, uid, [('forecast_id', '=', ids[0]), (
-            'period_start_date', '=', f_period_obj.browse(cr, uid, forecast_filter_id, context).p_date)])
+                'period_start_date', '=', f_period_obj.browse(cr, uid, forecast_filter_id, context).p_date)])
 
         else:
             s_rec = f_product_obj.search(cr, uid, [('forecast_id', '=', ids[0])], context)
@@ -109,7 +109,7 @@ class sale_forecast(models.Model):
 
     @api.model
     def create(self, vals):
-        if 'period_count' in  vals:
+        if 'period_count' in vals:
             if vals['period_count'] < 0:
                 raise Warning(_('Number of Periods should not be less than zero'))
         return super(sale_forecast, self).create(vals)
@@ -320,6 +320,9 @@ class sale_forecast(models.Model):
                 else:
                     available_qty = 0.0
 
+                if item.name and end_date:
+                    self.env['sale.forecast.periods'].sudo().create({'start_date': item.name,'end_date':end_date,'period_id':self.id})
+
                 vals = {
                     'name': product.name + ' on ' + str(item.name),
                     'forecast_id': self.id,
@@ -456,6 +459,21 @@ class sale_forecast(models.Model):
                             forecast_product_obj.browse(line.id).write(
                                 {'document_number': document_number, 'procurement_id': procurement_id})
                 self.state = 'done'
+
+
+class sale_forecast_period(models.Model):
+    _name = 'sale.forecast.periods'
+
+    name = fields.Char(compute='onchange_start_end_date',store=True)
+    start_date = fields.Date()
+    end_date = fields.Date()
+    period_id = fields.Many2one('sale.forecast',ondelete='cascade', index=True, copy=False)
+
+    @api.one
+    @api.depends('start_date', 'end_date')
+    def onchange_start_end_date(self):
+        if self.start_date and self.end_date:
+            self.name = str(self.start_date) + '-'+str(self.end_date)
 
 
 class product_product(models.Model):
