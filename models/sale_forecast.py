@@ -169,7 +169,7 @@ class sale_forecast(models.Model):
                 'forecast_id': self.id
             }
             period_list.append(period_env.create(vals))
-        self.filter_visible = True
+        # self.filter_visible = True
         return period_list
 
     @api.multi
